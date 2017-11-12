@@ -14,8 +14,8 @@ import javax.activation.MimetypesFileTypeMap;
 
 public class JavaWebServer {
 
-	private static final int fNumberOfThreads = 100;
-	private static final Executor fThreadPool = Executors.newFixedThreadPool(fNumberOfThreads);
+	private static final int NUMBER_OF_THREADS = 100;
+	private static final Executor THREAD_POOL = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
 	public static void main(String[] args) throws IOException {
 		ServerSocket socket = new ServerSocket(8080);
@@ -29,7 +29,7 @@ public class JavaWebServer {
 					HandleRequest(connection);
 				}
 			};
-			fThreadPool.execute(task);
+			THREAD_POOL.execute(task);
 		}
 
 	}
