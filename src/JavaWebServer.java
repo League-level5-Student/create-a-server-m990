@@ -30,6 +30,7 @@ public class JavaWebServer {
 				}
 			};
 			THREAD_POOL.execute(task);
+
 		}
 
 	}
@@ -47,10 +48,14 @@ public class JavaWebServer {
 
 			request = in.readLine();
 			System.out.println("--- Client request: " + request);
+			while (in.ready()) {
+				System.out.println(in.readLine());
 
+			}
 			out = new PrintWriter(s.getOutputStream(), true);
-			out.println("HTTP/1.0 200");
 
+			// System.out.println(new String(in.readLine()));
+			out.println("HTTP/1.0 200");
 			if (request.contains("GET")) {
 				String route = request.substring(request.indexOf('/'), request.indexOf(" H"));
 				if (route.equals("/")) {
@@ -60,26 +65,49 @@ public class JavaWebServer {
 					route = "/test.html";
 				}
 				responseFile = route.substring(1);
-				/*
-				if (responseFile.contains(".js")) {
-					out.println("Content-type:  text/javascript");
-				} else if (responseFile.contains(".css")) {
-					out.println("Content-type: text/css");
-				} else if (responseFile.contains(".html")) {
-					out.println("Content-type: text/html");
+
+				String mimeType = null;
+				int index = responseFile.lastIndexOf('.');
+				if (index == -1) {
+					mimeType = "application/octet-stream";
 				} else {
-					out.println("Content-type: application/octet-stream");
+					String fileExtension = responseFile.substring(index).toLowerCase();
+
+					// Try common types first
+					if (fileExtension.equals(".html")) {
+						mimeType = "text/html";
+					} else if (fileExtension.equals(".css")) {
+						mimeType = "text/css";
+					} else if (fileExtension.equals(".js")) {
+						mimeType = "application/javascript";
+					} else if (fileExtension.equals(".gif")) {
+						mimeType = "image/gif";
+					} else if (fileExtension.equals(".png")) {
+						mimeType = "image/png";
+					} else if (fileExtension.equals(".txt")) {
+						mimeType = "text/plain";
+					} else if (fileExtension.equals(".xml")) {
+						mimeType = "application/xml";
+					} else if (fileExtension.equals(".json")) {
+						mimeType = "application/json";
+					} else {
+						MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
+						mimeType = mimeTypesMap.getContentType(responseFile);
+					}
 				}
-				*/
-				out.println((new MimetypesFileTypeMap().getContentType(responseFile)));
-		
+
+				// System.out.println("mimeType " + mimeType);
+				out.println("Content-type: " + mimeType);
+
 				// Converts file to a string
-				String response = new String(Files.readAllBytes(Paths.get(responseFile)));
+				String response = new String(Files.readAllBytes(Paths.get(responseFile))).replaceAll("ipHeRe",
+						webServerAddress.substring(1));
 				out.println("Server-name: myserver");
 				out.println("Content-length: " + response.length());
 				out.println("");
 				out.println(response);
 			}
+
 			out.flush();
 			out.close();
 			s.close();
