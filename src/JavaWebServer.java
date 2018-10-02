@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -54,11 +55,14 @@ public class JavaWebServer {
             out.println("HTTP/1.0 200");
             out.println("Content-type: text/html");
             out.println("Server-name: myserver");
-            String response = "<html>"
-                    + "<head>"
-                    + "<title>My Web Server</title></head>"
-                    + "<h1>Change the server code so that it can read files!</h1>"
-                    + "</html>";
+            String line = "";
+            BufferedReader br = new BufferedReader(new FileReader("index.html"));
+            line = br.readLine();
+            String response = "";
+            while (line != null) {
+            		response += line;
+            		line = br.readLine();
+            }
             out.println("Content-length: " + response.length());
             out.println("");
             out.println(response);
